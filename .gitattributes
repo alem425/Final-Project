@@ -1,0 +1,36 @@
+# Handle line endings automatically for files detected as text
+# and leave all files detected as binary untouched.
+* text=auto
+
+# Source code
+*.kt text
+*.java text
+*.xml text
+*.json text
+*.toml text
+*.properties text
+*.gradle text
+*.kts text
+
+# Documentation
+*.md text
+*.txt text
+
+# Scripts
+*.sh text eol=lf
+*.bat text eol=crlf
+gradlew text eol=lf
+gradlew.bat text eol=crlf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.jar binary
+*.so binary
+*.apk binary
+*.aab binary
+*.keystore binary
