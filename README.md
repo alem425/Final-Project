@@ -25,7 +25,7 @@ cd FinalProject
 ### 3. Let Android Studio Sync
 
 - Android Studio will automatically:
-  - Download the correct Gradle version (8.13) via the wrapper
+  - Download the correct Gradle version (8.10.2) via the wrapper
   - Download all dependencies specified in `gradle/libs.versions.toml`
   - Set up the Android SDK components
 - Wait for "Gradle sync" to complete (check bottom status bar)
@@ -45,15 +45,19 @@ cd FinalProject
 
 This project uses:
 
-- **Gradle:** 8.13 (locked via wrapper)
-- **Android Gradle Plugin:** 8.13.1
+- **Gradle:** 8.10.2 (locked via wrapper)
+- **Android Gradle Plugin:** 8.7.2
 - **Kotlin:** 2.0.21
+- **AndroidX Core KTX:** 1.15.0
+- **AndroidX Activity:** 1.9.3
+- **AndroidX AppCompat:** 1.7.0
+- **Material Components:** 1.12.0
 - **Compile SDK:** 36
 - **Target SDK:** 36
 - **Min SDK:** 33
 - **Java:** 11
 
-All dependency versions are centralized in `gradle/libs.versions.toml` to ensure consistency.
+All dependency versions are centralized in `gradle/libs.versions.toml` to ensure consistency across all team members.
 
 ## Important Notes
 
