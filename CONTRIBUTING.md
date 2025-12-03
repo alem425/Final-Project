@@ -21,7 +21,7 @@ Write your code, add resources, and make sure everything works locally.
 
 ### 3. Commit and Push
 ```bash
-git add .
+git add file_name
 git commit -m "feat: add amazing new feature"
 git push origin feature/your-feature-name
 ```
