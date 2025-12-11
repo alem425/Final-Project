@@ -57,14 +57,17 @@ class GameView @JvmOverloads constructor(
 
     private fun loadObstacleImages() {
         try {
-            // Load coin image
-            coinBitmap = BitmapFactory.decodeResource(resources, R.drawable.coin)
+            // Load coin image and scale
+            val originalCoin = BitmapFactory.decodeResource(resources, R.drawable.coin)
+            coinBitmap = scaleBitmap(originalCoin, 0.5f)
 
             // Load star image
-            starBitmap = BitmapFactory.decodeResource(resources, R.drawable.star)
+            val originalStar = BitmapFactory.decodeResource(resources, R.drawable.star)
+            starBitmap = scaleBitmap(originalStar, 0.5f)
 
             // Load danger/obstacle image
-            dangerBitmap = BitmapFactory.decodeResource(resources, R.drawable.bird)
+            val originalDanger = BitmapFactory.decodeResource(resources, R.drawable.bird)
+            dangerBitmap = scaleBitmap(originalDanger, 0.5f)
 
         } catch (e: Exception) {
             // If images don't exist, create colored circles as fallback
@@ -107,7 +110,9 @@ class GameView @JvmOverloads constructor(
 
     // Set plane type - loads appropriate plane image
     fun setPlaneType(type: String) {
-        planeBitmap = loadPlaneBitmap(type)
+        val original = loadPlaneBitmap(type)
+        // Scale plane by 0.5
+        planeBitmap = scaleBitmap(original, 0.5f)
         invalidate()
     }
 
@@ -335,12 +340,57 @@ class GameView @JvmOverloads constructor(
         // Restart hint
         textPaint.color = Color.CYAN
         textPaint.textSize = 40f
-        canvas.drawText("Tap screen to restart", centerX, height / 3f + 180f, textPaint)
+        canvas.drawText("Tap here to restart", centerX, height / 3f + 180f, textPaint)
+
+        // Leaderboard Button
+        textPaint.color = Color.MAGENTA
+        textPaint.textSize = 60f
+        textPaint.textAlign = Paint.Align.CENTER
+        canvas.drawText("VIEW LEADERBOARD", centerX, height / 3f + 300f, textPaint)
 
         // Reset text paint
         textPaint.textAlign = Paint.Align.LEFT
         textPaint.color = Color.WHITE
         textPaint.textSize = 50f
+    }
+    
+    private fun scaleBitmap(bitmap: Bitmap, scale: Float): Bitmap {
+        val width = (bitmap.width * scale).toInt()
+        val height = (bitmap.height * scale).toInt()
+        return Bitmap.createScaledBitmap(bitmap, width, height, true)
+    }
+
+    enum class GameAction {
+        NONE, RESTART, LEADERBOARD
+    }
+
+    fun handleTouchEvent(x: Float, y: Float): GameAction {
+        if (!gameOver) return GameAction.NONE
+        
+        val centerX = width / 2f
+        val centerY = height / 3f
+        
+        // Simple hitboxes
+        // Restart area: near the restart text
+        if (y > centerY + 140 && y < centerY + 220) {
+            restartGame()
+            return GameAction.RESTART
+        }
+        
+        // Leaderboard area
+        if (y > centerY + 250 && y < centerY + 350) {
+            return GameAction.LEADERBOARD
+        }
+        
+        // Default to restart if they tap anywhere else? No, let's be specific or default to restart if huge tap.
+        // User asked for "option to see leaderboard".
+        // Let's make the whole top half restart and bottom half leaderboard if needed, 
+        // but specific hitboxes are better. 
+        // Let's stick to the specific areas + a generous fallback.
+        
+        // Fallback: Default restart for now if they tap elsewhere to keep existing behavior
+        restartGame()
+        return GameAction.RESTART
     }
 
     // Implement GameStateListener methods

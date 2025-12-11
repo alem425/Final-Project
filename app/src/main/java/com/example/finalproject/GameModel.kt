@@ -33,8 +33,8 @@ data class Plane(
     var x: Float = 0.5f,   // X position (0-1 relative to screen width)
     val y: Float = 0.8f,   // Y position (fixed near bottom)
     var type: String = "plane1",
-    val width: Float = 0.1f,   // Size relative to screen
-    val height: Float = 0.1f
+    val width: Float = 0.05f,   // Size relative to screen
+    val height: Float = 0.05f
 )
 
 //data class for score
@@ -160,7 +160,7 @@ class GameModel(context: Context): SensorEventListener {
             val obstacle = iterator.next()
             val obstacleCenterX = obstacle.x
             val obstacleCenterY = obstacle.y
-            val obstacleRadius = 0.03f  // Approximate size
+            val obstacleRadius = 0.015f  // Approximate size
 
             // Simple circle collision detection
             val dx = planeCenterX - obstacleCenterX
