@@ -190,7 +190,7 @@ class GameView @JvmOverloads constructor(
         }
 
         // Draw debug hitboxes
-        drawDebugHitboxes(canvas)
+        // drawDebugHitboxes(canvas)
     }
 
     private fun drawDebugHitboxes(canvas: Canvas) {

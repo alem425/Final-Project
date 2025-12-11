@@ -81,7 +81,7 @@ class GameModel(context: Context): SensorEventListener {
     private val accelerometer: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
 
     // Sensitivity for accelerometer (adjustable through seek bar later)
-    var tiltSensitivity: Float = 0.02f
+    var tiltSensitivity: Float = 0.0085f
 
     // Game listeners for UI updates
     interface GameStateListener {

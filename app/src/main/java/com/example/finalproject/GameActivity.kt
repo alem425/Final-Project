@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.MotionEvent
+import android.widget.Button
+import android.content.pm.ActivityInfo
 import androidx.appcompat.app.AppCompatActivity
 
 class GameActivity : AppCompatActivity(), GameModel.GameStateListener {
@@ -32,6 +34,9 @@ class GameActivity : AppCompatActivity(), GameModel.GameStateListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Lock orientation to portrait programmatically to be safe
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        
         setContentView(R.layout.activity_game)
 
         gameView = findViewById(R.id.gameView)
@@ -41,8 +46,18 @@ class GameActivity : AppCompatActivity(), GameModel.GameStateListener {
         gameView.setGameModel(gameModel)
         gameModel.addListener(this)
 
+        // Setup Change Plane button
+        val btnChangePlane = findViewById<Button>(R.id.btnChangePlane)
+        btnChangePlane.setOnClickListener {
+            val intent = Intent(this, SelectionActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+
         // Retrieve which plane was selected and pass to view
-        val selectedPlane = intent.getStringExtra("selectedPlane") ?: "plane1"
+        // Priority: Intent Extra > Saved Preference > Default
+        val savedPlane = UserManager.getSelectedPlane(this)
+        val selectedPlane = intent.getStringExtra("selectedPlane") ?: savedPlane ?: "plane1"
         gameModel.plane.type = selectedPlane
         gameView.setPlaneType(selectedPlane)
 

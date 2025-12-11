@@ -14,22 +14,27 @@
 
         <activity
             android:name=".GameActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
 
         <activity
             android:name=".LeaderboardActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
 
         <activity
             android:name=".SelectionActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
 
         <activity
             android:name=".LoginActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
 
         <activity
             android:name=".HomePageViewActivity"
+            android:screenOrientation="portrait"
             android:exported="true"
             android:theme="@style/Theme.FinalProject">
             <intent-filter>
@@ -40,6 +45,7 @@
 
         <activity
             android:name=".MainActivity"
+            android:screenOrientation="portrait"
             android:exported="true" />
 
     </application>
