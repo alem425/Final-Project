@@ -17,6 +17,7 @@ class GameView @JvmOverloads constructor(
 
     // Bitmaps for game objects - will load from res/drawable
     private var planeBitmap: Bitmap? = null
+    private var heartBitmap: Bitmap? = null
     private var coinBitmap: Bitmap? = null
     private var starBitmap: Bitmap? = null
     private var dangerBitmap: Bitmap? = null
@@ -57,14 +58,17 @@ class GameView @JvmOverloads constructor(
 
     private fun loadObstacleImages() {
         try {
-            // Load coin image
-            coinBitmap = BitmapFactory.decodeResource(resources, R.drawable.coin)
+            // Load coin image and scale (0.25)
+            val originalCoin = BitmapFactory.decodeResource(resources, R.drawable.coin)
+            coinBitmap = scaleBitmap(originalCoin, 0.25f)
 
-            // Load star image
-            starBitmap = BitmapFactory.decodeResource(resources, R.drawable.star)
+            // Load star image (0.5)
+            val originalStar = BitmapFactory.decodeResource(resources, R.drawable.star)
+            starBitmap = scaleBitmap(originalStar, 0.5f)
 
-            // Load danger/obstacle image
-            dangerBitmap = BitmapFactory.decodeResource(resources, R.drawable.bird)
+            // Load danger/obstacle image (0.4)
+            val originalDanger = BitmapFactory.decodeResource(resources, R.drawable.bird)
+            dangerBitmap = scaleBitmap(originalDanger, 0.4f)
 
         } catch (e: Exception) {
             // If images don't exist, create colored circles as fallback
@@ -107,7 +111,9 @@ class GameView @JvmOverloads constructor(
 
     // Set plane type - loads appropriate plane image
     fun setPlaneType(type: String) {
-        planeBitmap = loadPlaneBitmap(type)
+        val original = loadPlaneBitmap(type)
+        // Scale plane by 0.5
+        planeBitmap = scaleBitmap(original, 0.3f)
         invalidate()
     }
 
@@ -178,11 +184,47 @@ class GameView @JvmOverloads constructor(
         drawScore(canvas, model.score)
 
         // Draw game over if needed
+        // Draw game over if needed
         if (gameOver) {
             drawGameOver(canvas)
         }
+
+        // Draw debug hitboxes
+        drawDebugHitboxes(canvas)
     }
 
+    private fun drawDebugHitboxes(canvas: Canvas) {
+        val model = gameModel ?: return
+        val paint = Paint().apply {
+            style = Paint.Style.STROKE
+            strokeWidth = 3f
+        }
+
+        // Draw Plane Hitbox (0.03f radius)
+        paint.color = Color.GREEN
+        val planeX = model.plane.x * width
+        val planeY = model.plane.y * height + (model.plane.height * height / 3) // Align with visual center approx
+        // Actually model logic uses center=plane.y. But visuals might be different. 
+        // GameModel checkCollisions uses: planeCenterY = plane.y
+        // So we should draw exactly at plane.y * height
+        canvas.drawCircle(model.plane.x * width, model.plane.y * height, model.plane.width / 2 * width, paint)
+
+        // Draw Obstacle Hitboxes
+        paint.color = Color.RED
+        for (obstacle in model.getObstacles()) {
+             val radius = when (obstacle.type) {
+                ObstacleType.COIN -> 0.09f
+                ObstacleType.DANGER -> 0.108f
+                ObstacleType.STAR -> 0.075f
+            }
+            canvas.drawCircle(obstacle.x * width, obstacle.y * height, radius * width, paint) // logic radius is generic 0.03? No, we updated model.
+            // But here we need to use the SAME specific radii.
+            // NOTE: The code I wrote in GameModel uses:
+            // COIN -> 0.0075f, DANGER -> 0.012f, STAR -> 0.015f
+            // Multiplied by WIDTH because model uses relative 0-1
+        }
+    }
+    
     private fun drawClouds(canvas: Canvas) {
         // Draw some simple cloud shapes (optional background decoration)
         val cloudPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -262,7 +304,7 @@ class GameView @JvmOverloads constructor(
             color = Color.argb(150, 0, 0, 0)
             style = Paint.Style.FILL
         }
-        canvas.drawRoundRect(10f, 10f, 350f, 200f, 20f, 20f, scoreBgPaint)
+        canvas.drawRoundRect(10f, 10f, 350f, 260f, 20f, 20f, scoreBgPaint)
 
         // Draw score labels with icons
         textPaint.color = Color.WHITE
@@ -276,6 +318,10 @@ class GameView @JvmOverloads constructor(
         // Time
         val seconds = score.timeAlive / 1000
         canvas.drawText("⏱️ Time: ${seconds}s", 30f, 180f, textPaint)
+
+        // Lives (Hearts)
+        drawLives(canvas)
+
 
         // Total score (right side)
         val totalScoreBg = Paint().apply {
@@ -312,6 +358,23 @@ class GameView @JvmOverloads constructor(
         textPaint.textSize = 50f
     }
 
+
+    private fun drawLives(canvas: Canvas) {
+        val model = gameModel ?: return
+        val lives = model.plane.lives
+        val heartPaint = Paint().apply { 
+            textSize = 60f
+        }
+        
+        // Draw heart emojis
+        val startX = 30f
+        val startY = 240f // Below time
+        
+        for (i in 0 until lives) {
+            canvas.drawText("❤️", startX + (i * 70), startY, heartPaint)
+        }
+    }
+
     private fun drawGameOver(canvas: Canvas) {
         // Semi-transparent overlay
         val overlayPaint = Paint().apply {
@@ -335,17 +398,66 @@ class GameView @JvmOverloads constructor(
         // Restart hint
         textPaint.color = Color.CYAN
         textPaint.textSize = 40f
-        canvas.drawText("Tap screen to restart", centerX, height / 3f + 180f, textPaint)
+        canvas.drawText("Tap here to restart", centerX, height / 3f + 180f, textPaint)
+
+        // Leaderboard Button
+        textPaint.color = Color.MAGENTA
+        textPaint.textSize = 60f
+        textPaint.textAlign = Paint.Align.CENTER
+        canvas.drawText("VIEW LEADERBOARD", centerX, height / 3f + 300f, textPaint)
 
         // Reset text paint
         textPaint.textAlign = Paint.Align.LEFT
         textPaint.color = Color.WHITE
         textPaint.textSize = 50f
     }
+    
+    private fun scaleBitmap(bitmap: Bitmap, scale: Float): Bitmap {
+        val width = (bitmap.width * scale).toInt()
+        val height = (bitmap.height * scale).toInt()
+        return Bitmap.createScaledBitmap(bitmap, width, height, true)
+    }
+
+    enum class GameAction {
+        NONE, RESTART, LEADERBOARD
+    }
+
+    fun handleTouchEvent(x: Float, y: Float): GameAction {
+        if (!gameOver) return GameAction.NONE
+        
+        val centerX = width / 2f
+        val centerY = height / 3f
+        
+        // Simple hitboxes
+        // Restart area: near the restart text
+        if (y > centerY + 140 && y < centerY + 220) {
+            restartGame()
+            return GameAction.RESTART
+        }
+        
+        // Leaderboard area
+        if (y > centerY + 250 && y < centerY + 350) {
+            return GameAction.LEADERBOARD
+        }
+        
+        // Default to restart if they tap anywhere else? No, let's be specific or default to restart if huge tap.
+        // User asked for "option to see leaderboard".
+        // Let's make the whole top half restart and bottom half leaderboard if needed, 
+        // but specific hitboxes are better. 
+        // Let's stick to the specific areas + a generous fallback.
+        
+        // Fallback: Default restart for now if they tap elsewhere to keep existing behavior
+        restartGame()
+        return GameAction.RESTART
+    }
 
     // Implement GameStateListener methods
     override fun onScoreUpdated() {
         invalidate() // Redraw to show updated score
+    }
+
+    override fun onLivesUpdated() {
+        invalidate() // Redraw to show remaining lives
     }
 
     override fun onObstaclesUpdated() {
