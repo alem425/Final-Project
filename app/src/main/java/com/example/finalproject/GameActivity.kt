@@ -86,6 +86,7 @@ class GameActivity : AppCompatActivity(), GameModel.GameStateListener {
 
     // GameStateListener methods
     override fun onScoreUpdated() {}
+    override fun onLivesUpdated() {}
     override fun onObstaclesUpdated() {}
 
     override fun onGameOver(finalScore: Int) {
