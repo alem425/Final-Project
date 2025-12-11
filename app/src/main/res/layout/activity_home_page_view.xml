@@ -27,7 +27,7 @@
             android:text="SafeJet"
             android:fontFamily="@font/pacifico_regular"
             android:textSize="60sp"
-            android:textColor="#DCC1BF"
+            android:textColor="#8f4cf5"
             android:layout_marginBottom="60dp" />
 
         <androidx.appcompat.widget.AppCompatButton
