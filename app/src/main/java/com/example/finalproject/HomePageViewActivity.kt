@@ -3,6 +3,7 @@ package com.example.finalproject
 import android.graphics.drawable.AnimatedImageDrawable
 import android.os.Bundle
 import android.widget.Button
+import android.widget.Toast
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import android.content.Intent
@@ -51,6 +52,7 @@ class HomePageViewActivity : AppCompatActivity() {
         // Buttons
         val startBtn = findViewById<Button>(R.id.startBtn)
         val leaderboardBtn = findViewById<Button>(R.id.leaderboardBtn)
+        val signOutBtn = findViewById<Button>(R.id.signOutBtn)
 
         startBtn.setOnClickListener {
             if (UserManager.isUserLoggedIn(this)) {
@@ -72,6 +74,16 @@ class HomePageViewActivity : AppCompatActivity() {
         leaderboardBtn.setOnClickListener {
             val intent = Intent(this, LeaderboardActivity::class.java)
             startActivity(intent)
+        }
+
+        signOutBtn.setOnClickListener {
+            UserManager.logout(this)
+            Toast.makeText(this, "Signed out", Toast.LENGTH_SHORT).show()
+            
+            // Redirect to Login if needed, or just refresh UI
+            // Ideally, we should check if we need to redirect or just stay here
+            // Since Start button checks login status, staying here is fine, but UX might be better if we clear backstack or something.
+            // For now, let's just show the toast.
         }
 
     }

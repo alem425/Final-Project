@@ -53,6 +53,18 @@
             android:textColor="#FFFFFF"
             android:fontFamily="@font/pacifico_regular" />
 
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/signOutBtn"
+            android:layout_width="260dp"
+            android:layout_height="70dp"
+            android:background="@drawable/btn_3d"
+            android:backgroundTint="@null"
+            android:text="Sign Out"
+            android:textSize="28sp"
+            android:textColor="#FFFFFF"
+            android:fontFamily="@font/pacifico_regular"
+            android:layout_marginTop="30dp" />
+
     </LinearLayout>
 
     <LinearLayout
